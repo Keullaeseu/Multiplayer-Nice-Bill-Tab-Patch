@@ -80,4 +80,4 @@ It does not replace:
 - [RimWorld Multiplayer on GitHub](https://github.com/rwmt/Multiplayer)
 - [RimWorld Multiplayer on Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2606448745)
 - [Nice Bill Tab on Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3520130671)
-- [Multiplayer Nice Bill Tab Patch](https://github.com/Keullaeseu/Multiplayer-Nice-Bill-Tab-Patch/)
+- [Multiplayer Nice Bill Tab Patch](https://github.com/Keullaeseu)
