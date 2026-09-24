@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Multiplayer Nice Bill Tab Patch</name>
+	<author>Keullaeseu</author>
+	<packageId>keullaeseu.multiplayernicebilltabpatch</packageId>
+	<modVersion>1.0.0.0</modVersion>
+	<url>https://github.com/Keullaeseu/Multiplayer-Nice-Bill-Tab-Patch</url>
+	<description>Provides multiplayer support for the Nice Bill Tab mod by Andromeda.</description>
+
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+
+	<loadAfter>
+		<li>rwmt.Multiplayer</li>
+		<li>Andromeda.NiceBillTab</li>
+	</loadAfter>
+
+	<modDependencies>
+		<li>
+			<packageId>rwmt.Multiplayer</packageId>
+			<displayName>Multiplayer</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/2606448745</steamWorkshopUrl>
+			<downloadUrl>https://github.com/rwmt/Multiplayer/releases/latest</downloadUrl>
+		</li>
+		<li>
+			<packageId>Andromeda.NiceBillTab</packageId>
+			<displayName>Nice Bill Tab</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/3520130671</steamWorkshopUrl>
+		</li>
+	</modDependencies>
+</ModMetaData>
