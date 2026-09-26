@@ -7,7 +7,7 @@ using Verse;
 
 namespace MultiplayerNiceBillTabPatch.Source.Mods;
 
-public partial class NiceBillTabCompat
+public partial class NiceBillTab
 {
     #region Synced workers (game state only, run on every client)
 
@@ -73,30 +73,16 @@ public partial class NiceBillTabCompat
         }
     }
 
-    // Fresh bills are built INSIDE the sync from plain data (all MP-native
-    // args), so every client constructs an identical bill with live session
-    // references - no Precept objects cross the wire and nothing depends on
-    // expose fidelity. repeatForCount < 0 leaves repeat settings at default.
+    // Repairs the ideology style link on bills added through vanilla AddBill
+    // (MP's own expose may not carry the precept reference). Runs only when
+    // the added bill actually has a style; all args are MP-native.
     [MpCompatSyncMethod(SyncContext.MapSelected)]
-    private static void SyncedAddBill(Building_WorkTable table, RecipeDef recipe, ThingDef material, bool hasStyle,
-        int styleIndex, int repeatForCount)
+    private static void SyncedSetBillStyle(Building_WorkTable table, int billIndex, int billLoadID, bool hasStyle,
+        int styleIndex)
     {
-        if (table?.billStack == null || recipe == null) return;
-        var bill = recipe.MakeNewBill(ResolveStyle(recipe, hasStyle, styleIndex));
-        table.billStack.AddBill(bill);
-        ApplyMaterialToBill(material, recipe, bill);
-        // Fresh bills never carry a custom name, so no HasCustomName check needed.
-        if (Settings.EnableAutoNaming && bill is Bill_Production labeledBill && material != null)
-            labeledBill.RenamableLabel = material.LabelCap;
-        if (repeatForCount >= 0 && bill is Bill_Production productionBill && recipe.products != null &&
-            recipe.products.Count > 0)
-        {
-            var productCount = recipe.products[0].count;
-            if (productCount < 1) productCount = 1;
-            productionBill.repeatMode = BillRepeatModeDefOf.RepeatCount;
-            productionBill.repeatCount = Mathf.CeilToInt((float)repeatForCount / productCount);
-        }
-
+        var bill = FindBill(table, billIndex, billLoadID);
+        if (bill == null) return;
+        SetBillPrecept(bill, ResolveStyle(bill.recipe, hasStyle, styleIndex));
         TabBillsDrawer.shouldRefreshFilter = true;
     }
 

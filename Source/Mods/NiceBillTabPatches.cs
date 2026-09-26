@@ -9,7 +9,7 @@ using Verse;
 
 namespace MultiplayerNiceBillTabPatch.Source.Mods;
 
-public partial class NiceBillTabCompat
+public partial class NiceBillTab
 {
     #region UI invalidation (runs on every client, including inside sync execution)
 
@@ -52,10 +52,23 @@ public partial class NiceBillTabCompat
         if (TabBillsDrawer.LockedSelection == selection)
             TabBillsDrawer.LockedSelection = null;
 
-        // Style travels as (hasStyle, styleIndex) and is resolved inside the sync.
+        // Build fully locally (no game mutation), then add through vanilla
+        // BillStack.AddBill so MP's own (interface-tested) AddBill handling
+        // broadcasts it - never call AddBill nested inside our own sync.
         var style = selection.style;
-        var hasStyle = style != null;
-        SyncedAddBill(selection.workTable, recipe, selection.material, hasStyle, IndexOfStyle(recipe, style), -1);
+        var newBill = recipe.MakeNewBill(style);
+        ApplyMaterialToBill(selection.material, recipe, newBill);
+        // Fresh bills never carry a custom name, so no HasCustomName check needed.
+        if (Settings.EnableAutoNaming && newBill is Bill_Production labeledBill && selection.material != null)
+            labeledBill.RenamableLabel = selection.material.LabelCap;
+        selection.workTable.billStack.AddBill(newBill);
+        if (style != null)
+        {
+            var addedIndex = selection.workTable.billStack.Bills.IndexOf(newBill);
+            if (addedIndex >= 0)
+                SyncedSetBillStyle(selection.workTable, addedIndex, newBill.loadID, true,
+                    IndexOfStyle(recipe, style));
+        }
 
         if (recipe.conceptLearned != null)
             PlayerKnowledgeDatabase.KnowledgeDemonstrated(recipe.conceptLearned, KnowledgeAmount.Total);
@@ -108,7 +121,18 @@ public partial class NiceBillTabCompat
                 PlayerKnowledgeDatabase.KnowledgeDemonstrated(recipe.conceptLearned, KnowledgeAmount.Total);
             var table = workbench as Building_WorkTable;
             if (table != null)
-                SyncedAddBill(table, recipe, null, false, 0, count);
+            {
+                var newBill = recipe.MakeNewBill();
+                if (newBill is Bill_Production repeatBill && recipe.products != null && recipe.products.Count > 0)
+                {
+                    var productCount = recipe.products[0].count;
+                    if (productCount < 1) productCount = 1;
+                    repeatBill.repeatMode = BillRepeatModeDefOf.RepeatCount;
+                    repeatBill.repeatCount = Mathf.CeilToInt((float)count / productCount);
+                }
+
+                table.billStack.AddBill(newBill);
+            }
 
             if (workbench == TabBillsDrawer.LastSelTable)
             {

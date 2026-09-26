@@ -30,11 +30,11 @@ namespace MultiplayerNiceBillTabPatch.Source.Mods;
 ///     stat caches) is intentionally never synced.
 /// </summary>
 [MpCompatFor("Andromeda.NiceBillTab")]
-public partial class NiceBillTabCompat
+public partial class NiceBillTab
 {
     internal const string LogPrefix = "[Multiplayer Nice Bill Tab Patch]";
 
-    public NiceBillTabCompat(ModContentPack mod)
+    public NiceBillTab(ModContentPack content)
     {
         LongEventHandler.ExecuteWhenFinished(LatePatch);
     }

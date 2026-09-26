@@ -5,7 +5,7 @@ using Verse;
 
 namespace MultiplayerNiceBillTabPatch.Source.Mods;
 
-public partial class NiceBillTabCompat
+public partial class NiceBillTab
 {
     #region Helpers (local-only, never synced)
 
